@@ -1,0 +1,5 @@
+{
+  "name": "AEMO NEM Pricing",
+  "homeassistant": "2024.5.0",
+  "render_readme": true
+}

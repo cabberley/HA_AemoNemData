@@ -1,0 +1,59 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "title": "Select which States you want AEMO Nem data for",
+          "data": {
+            "state_qld": "Queensland",
+            "state_nsw": "New South Wales",
+            "state_vic": "Victoria",
+            "state_tas": "Tasmania",
+            "state_sa": "South Australia"
+          }
+        },
+        "reauth_confirm": {
+          "title": "Select which States you want AEMO Nem data for",
+          "data": {
+            "state_qld": "Queensland",
+            "state_nsw": "New South Wales",
+            "state_vic": "Victoria",
+            "state_tas": "Tasmania",
+            "state_sa": "South Australia"
+          }
+        },
+        "reconfigure": {
+            "title": "Select which States you want AEMO Nem data for",
+            "data": {
+                "state_qld": "Queensland",
+                "state_nsw": "New South Wales",
+                "state_vic": "Victoria",
+                "state_tas": "Tasmania",
+                "state_sa": "South Australia"
+                }
+        }
+      },
+      "error": {
+        "cannot_connect": "Failed to connect",
+        "invalid_auth": "Invalid authentication. Are your credentials correct?",
+        "no_devices": "No devices found on account",
+        "server_busy": "Aemo Nem servers are busy. Please try again later.",
+        "petkit_error": "Unknown error encountered. Please see Home Assistant logs for more details.",
+        "region_error": "Please select the country associated with your account.",
+        "timezone_error": "A timezone could not be found. If you are running Home Assistant as a standalone Docker container, you must define the TZ environmental variable. If the TZ variable is defined or you are running Home Assistant OS, your timezone was not found in the tzlocal library - Please manually select a timezone during setup."
+      },
+      "abort": {
+        "already_configured": "Aemo Nem is already configured",
+        "reauth_successful": "Reauthentication was successful"
+      }
+    },
+    "options": {
+      "step": {
+        "init":{
+          "title": "Integration Options",
+          "data" : {
+            "polling_interval": "AEMO NEM data Refresh Polling interval (seconds)"
+          }
+        }
+      }
+    }
+}
