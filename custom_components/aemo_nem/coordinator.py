@@ -44,7 +44,7 @@ class AemoNemUpdateCoordinator(DataUpdateCoordinator):
         #try:
             #LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
         minutes_now = (datetime.now()).minute
-        if (minutes_now/5) - int(minutes_now/5) <0.5:
+        if (minutes_now/5) - int(minutes_now/5) <0.5 or self.data is None:
             LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
             data = await self.client.get_aemo_data(self._au_states) #[self._au_states]) #self._au_states)
         else:

@@ -19,9 +19,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTRIBUTION, DOMAIN, AEMONEM_COORDINATOR, AEMO_WWW, MANUFACTURER, LOGGER
 from .coordinator import AemoNemUpdateCoordinator
-#from .sensor_properties import (
-#    ENTITY_DETAILS,
-#)
+from .sensor_properties import (
+    ENTITY_DETAILS,
+)
 
 
 async def async_setup_entry(
@@ -113,26 +113,26 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
     @property
     def name(self) -> str:
         """Return the name of the entity."""
-        return self.entity_name
+        return ENTITY_DETAILS[self.entity_name]["name"]
 
     @property
     def native_value(self) -> float:
         """Return the state of the entity."""
         #return self.entity_value
-        if self.entity_name.find("period_") == 0:
+        if ENTITY_DETAILS[self.entity_name]["data_set"] == "current_price_window":
             return self.coordinator.data["current_price_window"][self.device_key][self.entity_name]["price_kw"]
-        else:
+        elif ENTITY_DETAILS[self.entity_name]["data_set"] == "current_30min_forecast":
             return self.coordinator.data["current_30min_forecast"][self.device_key][self.entity_name]
 
     @property
     def entity_registry_visible_default(self) -> bool:
         """Return whether the entity should be visible by default."""
-        return True
+        return ENTITY_DETAILS[self.entity_name]["visible"]
 
     @property
     def entity_registry_enabled_default(self) -> bool:
         """Return whether the entity should be enabled by default."""
-        return True
+        return ENTITY_DETAILS[self.entity_name]["enabled"]
     
     @property
     def unrecorded_attributes(self):
@@ -157,43 +157,38 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
 
     async def async_update(self):
         await self.coordinator
-        
-    #@callback
-    #def _update_callback(self):
-    #    self.async_write_ha_state()
-        
-    #@property
-    #def native_unit_of_measurement(self):
-    #    """Return native Unit of Measurement for this entity."""
-    #    if ENTITY_DETAILS[self.ent_key[7:]]["unit"] is not None:
-    #        return ENTITY_DETAILS[self.ent_key[7:]]["unit"]
-    #    return
 
-    #@property
-    #def device_class(self) -> SensorDeviceClass:
-    #    """Return entity device class."""
-    #    if ENTITY_DETAILS[self.ent_key[7:]]["device_class"] is not None:
-    #        return ENTITY_DETAILS[self.ent_key[7:]]["device_class"]
-    #    return
+    @property
+    def native_unit_of_measurement(self):
+        """Return native Unit of Measurement for this entity."""
+        if ENTITY_DETAILS[self.entity_name]["unit"] is not None:
+            return ENTITY_DETAILS[self.entity_name]["unit"]
+        return
 
-    #@property
-    #def suggested_display_precision(self) -> int:
-    #    """Return the suggested precision for the value."""
-    #    if ENTITY_DETAILS[self.ent_key[7:]]["display_precision"] is not None:
-    #        return ENTITY_DETAILS[self.ent_key[7:]]["display_precision"]  # 3
-    #    return
+    @property
+    def device_class(self) -> SensorDeviceClass:
+        """Return entity device class."""
+        if ENTITY_DETAILS[self.entity_name]["device_class"] is not None:
+            return ENTITY_DETAILS[self.entity_name]["device_class"]
+        return
+
+    @property
+    def suggested_display_precision(self) -> int:
+        """Return the suggested precision for the value."""
+        if ENTITY_DETAILS[self.entity_name]["display_precision"] is not None:
+            return ENTITY_DETAILS[self.entity_name]["display_precision"]  # 3
+        return
 
     @property
     def state_class(self) -> SensorStateClass:
         """Return the type of state class."""
-    #    if ENTITY_DETAILS[self.ent_key[7:]]["state_class"] is not None:
-    #        return ENTITY_DETAILS[self.ent_key[7:]]["state_class"]
-        return SensorStateClass.MEASUREMENT
-        #return None
+        if ENTITY_DETAILS[self.entity_name]["state_class"] is not None:
+            return ENTITY_DETAILS[self.entity_name]["state_class"]
+        return
 
-    #@property
-    #def entity_category(self) -> EntityCategory:
-    #    """Set category to diagnostic."""
-    #    if ENTITY_DETAILS[self.ent_key[7:]]["category"] is not None:
-    #        return EntityCategory.DIAGNOSTIC
-    #    return
+    @property
+    def entity_category(self) -> EntityCategory:
+        """Set category to diagnostic."""
+        if ENTITY_DETAILS[self.entity_name]["category"] is not None:
+            return ENTITY_DETAILS[self.entity_name]["category"]
+        return
