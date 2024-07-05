@@ -11,12 +11,13 @@ from homeassistant.components.sensor import (
 )
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.const import MATCH_ALL
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, AEMONEM_COORDINATOR, AEMO_WWW, MANUFACTURER, LOGGER
+from .const import ATTRIBUTION, DOMAIN, AEMONEM_COORDINATOR, AEMO_WWW, MANUFACTURER, LOGGER
 from .coordinator import AemoNemUpdateCoordinator
 #from .sensor_properties import (
 #    ENTITY_DETAILS,
@@ -26,34 +27,34 @@ from .coordinator import AemoNemUpdateCoordinator
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set Up Redback Tech Sensor Entities."""
-    #global redback_devices, redback_entity_details, redback_dataSet
+    """Set Up AEMO NEM Tech Sensor Entities."""
 
     coordinator: AemoNemUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
         AEMONEM_COORDINATOR
     ]
-    LOGGER.debug("coordinator: %s", coordinator.data)
-    current_price = coordinator.data["current_price"]
+    current_price_window = coordinator.data["current_price_window"]
     current_30min_forecast = coordinator.data["current_30min_forecast"]
-    LOGGER.debug("current_30min: %s", current_30min_forecast)
     sensors = []
-    #redback_dataSet = "entities"
-    #device_keys = current_30min_forecast.keys()
     for device_key in current_30min_forecast.keys():
-    #    sensors = []
         for entity_key in current_30min_forecast[device_key].keys():
-            LOGGER.debug("device_key: %s", device_key)
-            LOGGER.debug("entity_key: %s", entity_key)
-            LOGGER.debug("entity_data: %s", current_30min_forecast[device_key][entity_key])
-            if entity_key != "forecast":
+            if entity_key != "forecast" and entity_key.find("flag") == -1:
                 sensors.extend([AemoNemSensorEntity(coordinator, device_key,entity_key,current_30min_forecast[device_key][entity_key])])
+        for entity_key in current_price_window[device_key].keys():
+            sensors.extend([AemoNemSensorEntity(coordinator, device_key,entity_key,current_price_window[device_key][entity_key]["price_kw"])])
+
     async_add_entities(sensors)
 
-class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
+class AemoSensorEntity(SensorEntity):
+     _entity_component_unrecorded_attributes: frozenset[str]
+
+class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
     """Representation of a Redback Tech Sensor Entity."""
 
+    _attr_attribution = ATTRIBUTION
+    _unrecorded_attributes = frozenset({MATCH_ALL})
+
     def __init__(self, coordinator, device_key,entity_key,entity_data):
-        super().__init__(coordinator)
+        super().__init__(coordinator,)
         self.entity_name = entity_key
         self.entity_value  = entity_data
         self.device_key=device_key
@@ -63,11 +64,27 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
             + "_"
             + entity_key
         )
+    
+    #async def async_added_to_hass(self) -> None:
+    #    """Set up a listener and load data."""
+    #    self.async_on_remove(self.coordinator.async_add_listener(self._update_callback))
+    #    self.async_on_remove(self.coordinator.async_add_listener(self._update_callback))
+    #    self._update_callback()
 
+    @callback
+    def _update_callback(self) -> None:
+        self.async_write_ha_state()
+
+    @property
+    def should_poll(self) -> bool:
+        """Entities do not individually poll."""
+        #return False
+        return True
+    
     #@property
-    #def ent_data(self) -> Inverters:
+    #def ent_data(self):
     #    """Handle coordinator data for entities."""
-    #    return self.coordinator.data.entities[self.ent_key]
+    #    return self.coordinator.data["current_30min_forecast"][self.device_key][self.entity_name]
 
     @property
     def device_info(self) -> dict[str, Any]:
@@ -76,17 +93,17 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
             "identifiers": {(DOMAIN, self.device_key)},
             "name": "AEMO NEM Region: " + self.device_key,
             "manufacturer": MANUFACTURER,
-            #"model": redback_devices[self.ent_id].model,
-            #"sw_version": redback_devices[self.ent_id].sw_version,
-            #"hw_version": redback_devices[self.ent_id].hw_version,
-            #"serial_number": redback_devices[self.ent_id].serial_number,
+            "model": "AEMO NEM",
+            #"sw_version": ,
+            #"hw_version": ,
+            #"serial_number": ,
             "configuration_url": AEMO_WWW,
         }
 
     @property
     def unique_id(self) -> str:
         """Sets unique ID for this entity."""
-        return self.entity_id 
+        return self.entity_id
 
     @property
     def has_entity_name(self) -> bool:
@@ -101,7 +118,11 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def native_value(self) -> float:
         """Return the state of the entity."""
-        return self.entity_value
+        #return self.entity_value
+        if self.entity_name.find("period_") == 0:
+            return self.coordinator.data["current_price_window"][self.device_key][self.entity_name]["price_kw"]
+        else:
+            return self.coordinator.data["current_30min_forecast"][self.device_key][self.entity_name]
 
     @property
     def entity_registry_visible_default(self) -> bool:
@@ -112,6 +133,11 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
     def entity_registry_enabled_default(self) -> bool:
         """Return whether the entity should be enabled by default."""
         return True
+    
+    @property
+    def unrecorded_attributes(self):
+        """Return unrecorded attributes."""
+        return frozenset({MATCH_ALL})
 
     @property
     def extra_state_attributes(self):
@@ -121,7 +147,6 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
             data = {}
             if dataAttributes is None:
                 data["forecast"] = None
-                #data["min_ongrid_soc_0to1"] = None
             else:
                 data = {
                     "forecast": dataAttributes,
@@ -129,6 +154,14 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
             return data
         else:
             return None
+
+    async def async_update(self):
+        await self.coordinator
+        
+    #@callback
+    #def _update_callback(self):
+    #    self.async_write_ha_state()
+        
     #@property
     #def native_unit_of_measurement(self):
     #    """Return native Unit of Measurement for this entity."""
@@ -150,12 +183,13 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
     #        return ENTITY_DETAILS[self.ent_key[7:]]["display_precision"]  # 3
     #    return
 
-    #@property
-    #def state_class(self) -> SensorStateClass:
-    #    """Return the type of state class."""
+    @property
+    def state_class(self) -> SensorStateClass:
+        """Return the type of state class."""
     #    if ENTITY_DETAILS[self.ent_key[7:]]["state_class"] is not None:
     #        return ENTITY_DETAILS[self.ent_key[7:]]["state_class"]
-    #    return
+        return SensorStateClass.MEASUREMENT
+        #return None
 
     #@property
     #def entity_category(self) -> EntityCategory:

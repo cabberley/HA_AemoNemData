@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 from aemonemdata import AemoNemData
-from redbacktechpy.exceptions import AuthError, RedbackTechClientError
+from aemonemdata.exceptions import AuthError
 #rom redbacktechpy.model import RedbackTechData
 
 
@@ -22,13 +22,13 @@ from .const import DOMAIN, LOGGER, POLLING_INTERVAL
 class AemoNemUpdateCoordinator(DataUpdateCoordinator):
     """Aemo Nem Update Coordinator."""
 
-    #data: RedbackTechData
+    data: dict   #{} # [] #{} #RedbackTechData
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize the Aemo Nem coordinator."""
         self._au_states = entry.data["au_states"]
         try:
-            self.client = AemoNemData( async_get_clientsession(hass)
+            self.client = AemoNemData(   async_get_clientsession(hass)
             )
             super().__init__(
                 hass,
@@ -41,13 +41,17 @@ class AemoNemUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from Aemo Nem."""
-        try:
+        #try:
+            #LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
+        minutes_now = (datetime.now()).minute
+        if (minutes_now/5) - int(minutes_now/5) <0.5:
             LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
             data = await self.client.get_aemo_data(self._au_states) #[self._au_states]) #self._au_states)
-            LOGGER.debug("Data from Aemo Nem: %s", data)
-        except AuthError as error:
-            raise ConfigEntryAuthFailed(error) from error
-        except RedbackTechClientError as error:
-            raise UpdateFailed(error) from error
         else:
-            return data
+            LOGGER.debug("Not fetching data from Aemo Nem waiting for next 5min interval to start: %s", self._au_states)
+            data = self.data
+        #except AuthError as error:
+        #    raise ConfigEntryAuthFailed(error) from error
+        #else:
+        #    return data
+        return data
