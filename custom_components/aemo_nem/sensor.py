@@ -155,8 +155,8 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
         else:
             return None
 
-    async def async_update(self):
-        await self.coordinator
+    #async def async_update(self):
+    #    await self.coordinator
 
     @property
     def native_unit_of_measurement(self):
