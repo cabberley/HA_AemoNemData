@@ -11,7 +11,7 @@
   "loggers": ["aemo_nem"],
   "requirements": [
 
-      "aemonemdata==2024.7.2b9"
+      "aemonemdata==2024.7.3b1"
   ],
   "ssdp": [],
 

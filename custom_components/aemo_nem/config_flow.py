@@ -118,7 +118,7 @@ class AemoNemConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if state_sa:
                 au_states.append("SA")
             
-            unique_id = str(uuid.uuid4())
+            unique_id = "aemo_nem_data" #str(uuid.uuid4())
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
             LOGGER.debug("au_states: %s", au_states)
@@ -146,9 +146,58 @@ class AemoNemConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> FlowResult:
         """Handle reconfiguration of the integration."""
+        LOGGER.debug("reconfigure")
+        LOGGER.debug("self.entry: %s", self)
+        self.entry_id = self.hass.config_entries.async_get_entry(self.context["entry_id"])
+        #entry_id = self.entry.entry_id
+        LOGGER.debug("entry_id: %s", self.entry_id.entry_id)
+        if user_input is not None:
+            state_qld = user_input["state_qld"]
+            state_nsw = user_input["state_nsw"]
+            state_vic = user_input["state_vic"]
+            state_tas = user_input["state_tas"]
+            state_sa = user_input["state_sa"]
+            au_states = []
+            if state_qld:
+                au_states.append("QLD")
+            if state_nsw:
+                au_states.append("NSW")
+            if state_vic:
+                au_states.append("VIC")
+            if state_tas:
+                au_states.append("TAS")
+            if state_sa:
+                au_states.append("SA")
+        
+            self.hass.config_entries.async_update_entry(
+                self.entry_id,
+                
+                data={
+                    "state_qld": state_qld ,
+                    "state_nsw": state_nsw ,
+                    "state_vic": state_vic ,
+                    "state_tas": state_tas ,
+                    "state_sa": state_sa ,
+                    "au_states": au_states, 
+                },
+                #options={
+                #    POLLING_INTERVAL: 60,
+                #},
+            )
+            await self.hass.config_entries.async_reload(self.entry_id.entry_id)
+            return self.async_abort(reason="reconfigure_successful")
+            
         return self.async_show_form(
             step_id="reconfigure",
-            data_schema=DATA_SCHEMA,
+            data_schema=vol.Schema(
+    {
+        vol.Required("state_qld", default=False): cv.boolean,
+        vol.Required("state_nsw", default=False): cv.boolean,
+        vol.Required("state_vic", default=False): cv.boolean,
+        vol.Required("state_tas", default=False): cv.boolean,
+        vol.Required("state_sa", default=False): cv.boolean,
+    }
+),
         )
 
 
