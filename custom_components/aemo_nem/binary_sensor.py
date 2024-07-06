@@ -14,7 +14,6 @@ from .const import (
     AEMONEM_COORDINATOR,
     AEMO_WWW,
     MANUFACTURER,
-    LOGGER,
 )
 from .coordinator import AemoNemUpdateCoordinator
 from .binary_sensor_properties import ENTITY_DETAILS
@@ -23,25 +22,23 @@ from .binary_sensor_properties import ENTITY_DETAILS
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
-    """Set Up Redback Tech Sensor Entities."""
-    #global redback_devices, redback_entity_details
+    """Set Up Aemo Nem Binary Sensor Entities."""
 
     coordinator: AemoNemUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
         AEMONEM_COORDINATOR
     ]
 
-    #redback_devices = coordinator.data.devices
-    #redback_entity_details = coordinator.data.entities
     binary_sensors = []
 
-    entity_keys = coordinator.data["current_30min_forecast"]["QLD1"].keys()
-    device_key = "QLD1"
-    # swap this around to get the binary sensors quicker
-    for entity_key in entity_keys:
-        if entity_key in ENTITY_DETAILS:
-            binary_sensors.extend(
-                [RedbackTechBinarySensorEntity(coordinator, device_key, entity_key)]
-            )
+    entity_keys = coordinator.data["current_30min_forecast"] #["QLD1"].keys()
+    for device_key in entity_keys:
+        entity_keys = coordinator.data["current_30min_forecast"][device_key].keys()
+        
+        for entity_key in entity_keys:
+            if entity_key in ENTITY_DETAILS:
+                binary_sensors.extend(
+                    [RedbackTechBinarySensorEntity(coordinator, device_key, entity_key)]
+                )
 
     async_add_entities(binary_sensors)
 
@@ -58,14 +55,10 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
             + "_"
             + device_key.lower()
             + "_"
-            + entity_key #ENTITY_DETAILS[self.ent_key]["name"]
+            + entity_key
         )
         self.entity_name = entity_key
-        #self.entity_value  = entity_data
         self.device_key=device_key
-        
-        #LOGGER.debug(f"number_data1: {self.ent_data}")
-        #LOGGER.debug(f"number_data2: {self.ent_id}")
 
     @property
     def entity_data(self):
@@ -118,8 +111,6 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
         """Return whether the entity should be visible by default."""
         if ENTITY_DETAILS[self.entity_key]["visible"]:
             return True
-        #elif self.ent_data.data["value"] is None:
-        #    return False
         return False
 
     @property
