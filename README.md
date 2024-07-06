@@ -10,7 +10,7 @@
 </h1>
 
 <p align="center">
-  <href="https://github.com/cabberley/HA_aemonemdata/releases"><img src="https://img.shields.io/github/v/release/cabberley/HA_aemonemdata?display_name=tag&include_prereleases&sort=semver" alt="Current version">
+  <img src="https://img.shields.io/github/v/release/cabberley/HA_aemonemdata?display_name=tag&include_prereleases&sort=semver" alt="Current version">
   <img alt="GitHub" src="https://img.shields.io/github/license/cabberley/HA_aemonemdata"> <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/cabberley/ha_aemonemdata/main.yml">
   <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues/cabberley/ha_aemonemdata"> <img alt="GitHub User's stars" src="https://img.shields.io/github/stars/cabberley">
 
