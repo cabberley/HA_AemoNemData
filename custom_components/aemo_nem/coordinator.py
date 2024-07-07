@@ -22,7 +22,7 @@ from .const import DOMAIN, LOGGER, POLLING_INTERVAL
 class AemoNemUpdateCoordinator(DataUpdateCoordinator):
     """Aemo Nem Update Coordinator."""
 
-    data: dict   #{} # [] #{} #RedbackTechData
+    data: dict  
 
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize the Aemo Nem coordinator."""
@@ -41,12 +41,9 @@ class AemoNemUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self):
         """Fetch data from Aemo Nem."""
-        #try:
-            #LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
         time_now = datetime.now()
         minutes_now = time_now.minute
         seconds_now = time_now.second
-        #if (minutes_now/5) - int(minutes_now/5) <0.5 or self.data is None:
         if ((minutes_now/5) - int(minutes_now/5) <0.3
                 and (minutes_now/5) - int(minutes_now/5) >0.1
                 or (minutes_now/5) - int(minutes_now/5) <0.2
@@ -58,8 +55,4 @@ class AemoNemUpdateCoordinator(DataUpdateCoordinator):
         else:
             LOGGER.debug("Not fetching data from Aemo Nem waiting for next 5min interval to start: %s", self._au_states)
             data = self.data
-        #except AuthError as error:
-        #    raise ConfigEntryAuthFailed(error) from error
-        #else:
-        #    return data
         return data

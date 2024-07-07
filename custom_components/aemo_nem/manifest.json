@@ -11,11 +11,11 @@
   "loggers": ["aemo_nem"],
   "requirements": [
 
-      "aemonemdata==2024.7.3"
+      "aemonemdata==2024.7.4"
   ],
   "ssdp": [],
 
-  "version": "2024.7.3",
+  "version": "2024.7.4",
 
   "zeroconf": []
 }

@@ -48,7 +48,6 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
 
     def __init__(self, coordinator, device_key, entity_key):
         super().__init__(coordinator)
-        #self.ent_id = entity_key[:7]
         self.entity_key = entity_key
         self.entity_id = (
             "binary_sensor.aemonem"

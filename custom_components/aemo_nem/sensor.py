@@ -44,14 +44,14 @@ async def async_setup_entry(
 
     async_add_entities(sensors)
 
-class AemoSensorEntity(SensorEntity):
-     _entity_component_unrecorded_attributes: frozenset[str]
+#class AemoSensorEntity(SensorEntity):
+    # _entity_component_unrecorded_attributes: frozenset[str]
 
-class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
+class AemoNemSensorEntity(CoordinatorEntity, SensorEntity): #SensorEntity):
     """Representation of a Redback Tech Sensor Entity."""
 
     _attr_attribution = ATTRIBUTION
-    _unrecorded_attributes = frozenset({MATCH_ALL})
+    #_unrecorded_attributes = frozenset({MATCH_ALL})
 
     def __init__(self, coordinator, device_key,entity_key,entity_data):
         super().__init__(coordinator,)
@@ -64,12 +64,6 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
             + "_"
             + entity_key
         )
-    
-    #async def async_added_to_hass(self) -> None:
-    #    """Set up a listener and load data."""
-    #    self.async_on_remove(self.coordinator.async_add_listener(self._update_callback))
-    #    self.async_on_remove(self.coordinator.async_add_listener(self._update_callback))
-    #    self._update_callback()
 
     @callback
     def _update_callback(self) -> None:
@@ -78,14 +72,9 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
     @property
     def should_poll(self) -> bool:
         """Entities do not individually poll."""
-        #return False
-        return True
+        return False
+        #return True
     
-    #@property
-    #def ent_data(self):
-    #    """Handle coordinator data for entities."""
-    #    return self.coordinator.data["current_30min_forecast"][self.device_key][self.entity_name]
-
     @property
     def device_info(self) -> dict[str, Any]:
         """Return device registry information for this entity."""
@@ -154,9 +143,6 @@ class AemoNemSensorEntity(CoordinatorEntity, AemoSensorEntity): #SensorEntity):
             return data
         else:
             return None
-
-    #async def async_update(self):
-    #    await self.coordinator
 
     @property
     def native_unit_of_measurement(self):
