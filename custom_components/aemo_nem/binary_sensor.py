@@ -62,7 +62,7 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
     @property
     def entity_data(self):
         """Handle coordinator data for entities."""
-        return self.coordinator.data["current_30min_forecast"]["QLD1"][self.entity_name]
+        return self.coordinator.data["current_30min_forecast"][self.device_key][self.entity_name]
 
     @property
     def device_info(self) -> dict[str, Any]:
