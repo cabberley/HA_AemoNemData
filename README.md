@@ -91,7 +91,7 @@ This is the rolling value of the cumulative price that AEMO uses to determine if
 
 ## Other Data
 
-### 5min periods of current 30mi window
+### 5min periods of current 30min window
 
 The number of completed 5 minute spot prices of the current 30min pricing period.
 
