@@ -105,7 +105,7 @@ On or Off if the market has been suspended
 
 ### Administered Price Cap
 
-The Regions current Price Cap, if a market suspension of Price Cap is triggered by the cumulative pricing then this is the current price per mW for all pricing until the suspension is lifted.
+The Regions current Price Cap, if a market suspension of Price Cap is triggered by the cumulative pricing then this is the current price per MW for all pricing until the suspension is lifted.
 
 ### Cumulative Price Threshold
 
@@ -117,4 +117,4 @@ This is the current percentage of the rolling cumulative price with the Cumulati
 
 ### Market Price Cap
 
-The Regions current maximum price per mW that the 5 minute pricing can reach. Increases normally each year on the 1st of July.
+The Regions current maximum price per MW that the 5 minute pricing can reach. Increases normally each year on the 1st of July.
