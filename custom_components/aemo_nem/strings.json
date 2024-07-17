@@ -43,7 +43,9 @@
       },
       "abort": {
         "already_configured": "Aemo Nem is already configured",
-        "reauth_successful": "Reauthentication was successful"
+        "reauth_successful": "Reauthentication was successful",
+        "reconfigure_successful": "Reconfiguration was successful",
+        "updates_successful": "Updates were successful"
       }
     },
     "options": {

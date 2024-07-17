@@ -20,8 +20,10 @@ SCAN_INTERVAL = timedelta(minutes=1)
 AEMONEM_COORDINATOR = "aemo_nem_coordinator"
 AEMO_WWW = "https://aemo.com.au/"
 MANUFACTURER = "Australian Energy Market Operator"
+ATTRIBUTION = "Data provided by AEMO"
 
 PLATFORMS = [
+    Platform.BINARY_SENSOR,
     Platform.SENSOR,
 ]
 

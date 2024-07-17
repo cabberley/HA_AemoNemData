@@ -51,5 +51,31 @@ async def async_remove_config_entry_device(
     hass: HomeAssistant, entry: ConfigEntry, device_entry: DeviceEntry
 ) -> bool:
     """Remove Aemo Nem config entry."""
-
+    LOGGER.debug("Removing device from device registryA: %s", device_entry.id)
+    LOGGER.debug("Removing device from device registryB: %s", (next(iter(device_entry.identifiers))[1])[:3])
+    LOGGER.debug("Removing device from device registryC: %s", device_entry.identifiers)
+    reconfig = {**entry.data}
+    state = "state_"+((next(iter(device_entry.identifiers))[1])[:3]).lower()
+    LOGGER.debug("state: %s", state)
+    reconfig["state_"+((next(iter(device_entry.identifiers))[1])[:3]).lower()]=False
+    reconfig[state]=False
+    au_states = []
+    if reconfig["state_qld"]:
+        au_states.append("QLD")
+    if reconfig["state_nsw"]:
+        au_states.append("NSW")
+    if reconfig["state_vic"]:
+        au_states.append("VIC")
+    if reconfig["state_tas"]:
+        au_states.append("TAS")
+    if reconfig["state_sa"]:
+        au_states.append("SA")
+    LOGGER.debug("au_states: %s", au_states)
+    reconfig["au_states"] = au_states
+    options = {**entry.options}
+    LOGGER.debug("reconfig: %s", reconfig)
+    hass.config_entries.async_update_entry(
+            entry, data=reconfig, options=options, version=entry.version
+    )
+    LOGGER.debug("config_entry_after: %s",hass.config_entries.async_get_entry(entry.entry_id))
     return True
