@@ -5,10 +5,7 @@ from homeassistant.components.sensor import (
 
 from homeassistant.helpers.entity import EntityCategory
 
-from homeassistant.const import (
-    PERCENTAGE,
-    
-)
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -250,6 +247,76 @@ ENTITY_DETAILS = {
         "visible": True,
         "enabled": True,
         "data_set": "current_price_window",
+    },
+    "total_demand": {
+        "name": "Generation Total Demand",
+        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "icon": None,
+        "device_class": SensorDeviceClass.ENERGY,
+        "state_class": SensorStateClass.TOTAL,
+        "display_precision": 0,
+        "options": None,
+        "mode": None,
+        "category": None,
+        "visible": True,
+        "enabled": True,
+        "data_set": "current_30min_forecast",
+    },
+    "scheduled_generation": {
+        "name": "Generation Scheduled",
+        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "icon": None,
+        "device_class": SensorDeviceClass.ENERGY,
+        "state_class": SensorStateClass.TOTAL,
+        "display_precision": 0,
+        "options": None,
+        "mode": None,
+        "category": None,
+        "visible": True,
+        "enabled": True,
+        "data_set": "current_30min_forecast",
+    },
+    "semi_scheduled_generation": {
+        "name": "Generation Semi Scheduled",
+        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "icon": None,
+        "device_class": SensorDeviceClass.ENERGY,
+        "state_class": SensorStateClass.TOTAL,
+        "display_precision": 0,
+        "options": None,
+        "mode": None,
+        "category": None,
+        "visible": True,
+        "enabled": True,
+        "data_set": "current_30min_forecast",
+    },
+    "net_interconnector_flows": {
+        "name": "Generation Net Connector Flows",
+        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "icon": None,
+        "device_class": SensorDeviceClass.ENERGY,
+        "state_class": SensorStateClass.TOTAL,
+        "display_precision": 0,
+        "options": None,
+        "mode": None,
+        "category": None,
+        "visible": True,
+        "enabled": True,
+        "data_set": "current_30min_forecast",
+    },
+    "settlement_date": {
+        "name": "Generation Settlement Date",
+        "unit": None,
+        "icon": None,
+        "device_class": SensorDeviceClass.TIMESTAMP,
+        "state_class": None,
+        "display_precision": 0,
+        "options": None,
+        "mode": None,
+        "category": None,
+        "visible": True,
+        "enabled": True,
+        "data_set": "current_30min_forecast",
     },
 }
 
