@@ -288,4 +288,4 @@ class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def entity_category(self) -> EntityCategory:
         """Set category to diagnostic."""
-        return False
+        return
