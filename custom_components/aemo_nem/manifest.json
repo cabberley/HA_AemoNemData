@@ -11,7 +11,8 @@
   "loggers": ["aemo_nem"],
   "requirements": [
 
-      "aemonemdata==2024.8.0"
+      "aemonemdata==2024.8.0",
+      "aemo-to-tariff==0.1.8"
   ],
   "ssdp": [],
 

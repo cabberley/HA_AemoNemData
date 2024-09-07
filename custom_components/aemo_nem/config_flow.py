@@ -26,7 +26,9 @@ DATA_SCHEMA = vol.Schema(
         vol.Required("state_nsw", default=False): cv.boolean,
         vol.Required("state_vic", default=False): cv.boolean,
         vol.Required("state_tas", default=False): cv.boolean,
-        vol.Required("state_sa", default=False): cv.boolean,
+        vol.Required("state_sa", default=False): cv.boolean,                vol.Required("network"): str,
+        vol.Required("network"): str,
+        vol.Required("tariff"): str,
     }
 )
 

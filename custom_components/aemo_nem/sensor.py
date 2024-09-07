@@ -22,6 +22,7 @@ from .coordinator import AemoNemUpdateCoordinator
 from .sensor_properties import (
     ENTITY_DETAILS,
 )
+from aemo_to_tariff import spot_to_tariff
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
@@ -50,6 +51,10 @@ async def async_setup_entry(
         for entity_key in current_price_window[device_key].keys():
             sensors.extend([AemoNemSensorEntity(coordinator, device_key,entity_key,current_price_window[device_key][entity_key]["price_kw"])])
 
+    network = entry.data.get("network")
+    tariff = entry.data.get("tariff")
+    if network and tariff:
+        sensors.append(AemoNemSpotPriceSensorEntity(coordinator, device_key, network, tariff))
     async_add_entities(sensors)
 
 
@@ -184,6 +189,30 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
             return ENTITY_DETAILS[self.entity_name]["category"]
         return
 
+class AemoNemSpotPriceSensorEntity(AemoNemSensorEntity):
+    def __init__(self, coordinator, device_key, network, tariff):
+        super().__init__(coordinator, device_key, "spot_price", None)
+        self.network = network
+        self.tariff = tariff
+
+    @property
+    def native_value(self) -> float:
+        aemo_price = self.coordinator.data["current_price_window"][self.device_key]["price"]["price_kw"]
+        return spot_to_tariff(self.coordinator.data["current_timestamp"], 
+                              self.network, 
+                              self.tariff, 
+                              aemo_price)
+
+    @property
+    def name(self) -> str:
+        return f"AEMO NEM Spot Price ({self.network} - {self.tariff})"
+
+
+# In async_setup_entry:
+network = entry.data.get("network")
+tariff = entry.data.get("tariff")
+if network and tariff:
+    sensors.append(AemoNemSpotPriceSensorEntity(coordinator, device_key, network, tariff))
 
 class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
     """Representation of a Redback Tech Sensor Entity."""
