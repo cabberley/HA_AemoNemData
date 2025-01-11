@@ -47,7 +47,7 @@ class AemoNemUpdateCoordinator(DataUpdateCoordinator):
         if ((minutes_now/5) - int(minutes_now/5) <0.3
                 and (minutes_now/5) - int(minutes_now/5) >0.1
                 or (minutes_now/5) - int(minutes_now/5) <0.2
-                and seconds_now >20
+                and seconds_now >10
                 or self.data is None
                 ):
             LOGGER.debug("Fetching data from Aemo Nem: %s", self._au_states)
