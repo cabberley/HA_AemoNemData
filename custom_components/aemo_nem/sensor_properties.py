@@ -82,7 +82,7 @@ ENTITY_DETAILS = {
     },
     "current_cumulative_price": {
         "name": "Current Cumulative Price",
-        "unit": UNIT_MEGA,
+        "unit": "$",
         "icon": None,
         "device_class": None,
         "state_class": SensorStateClass.MEASUREMENT,
