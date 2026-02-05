@@ -65,9 +65,9 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
         self.device_key=device_key
         self.entity_id = (
             "sensor.aemo_nem_"
-            + device_key
+            + device_key.lower()
             + "_"
-            + entity_key
+            + entity_key.lower()
         )
 
     @callback
@@ -197,9 +197,9 @@ class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
         self.device_key=device_key
         self.entity_id = (
             "sensor.aemo_nem_"
-            + device_key
+            + device_key.lower()
             + "_"
-            + entity_key
+            + entity_key.lower()
         )
 
     @callback

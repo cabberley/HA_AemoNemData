@@ -54,7 +54,7 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
             + "_"
             + device_key.lower()
             + "_"
-            + entity_key
+            + entity_key.lower()
         )
         self.entity_name = entity_key
         self.device_key=device_key
