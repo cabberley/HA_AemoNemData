@@ -16,6 +16,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .const import ATTRIBUTION, DOMAIN, AEMONEM_COORDINATOR, AEMO_WWW, MANUFACTURER, LOGGER
 from .coordinator import AemoNemUpdateCoordinator
@@ -63,11 +64,14 @@ class AemoNemSensorEntity(CoordinatorEntity, SensorEntity):
         self.entity_name = entity_key
         self.entity_value  = entity_data
         self.device_key=device_key
+        # Use slugify() to ensure entity_id contains only valid characters.
+        # Hyphens in interconnector codes (e.g. V-SA, V-S-MNSP1) are not valid
+        # in HA entity IDs and will be rejected from HA 2027.2.0.
         self.entity_id = (
             "sensor.aemo_nem_"
-            + device_key.lower()
+            + slugify(device_key)
             + "_"
-            + entity_key.lower()
+            + slugify(entity_key)
         )
 
     @callback
@@ -195,11 +199,15 @@ class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
         self.entity_name = entity_key
         self.entity_value  = entity_data["value"]
         self.device_key=device_key
+        # Use slugify() to ensure entity_id contains only valid characters.
+        # Interconnector codes (V-SA, V-S-MNSP1, T-V-MNSP1, etc.) contain
+        # hyphens that are not valid in HA entity IDs and will be rejected
+        # from HA 2027.2.0.
         self.entity_id = (
             "sensor.aemo_nem_"
-            + device_key.lower()
+            + slugify(device_key)
             + "_"
-            + entity_key.lower()
+            + slugify(entity_key)
         )
 
     @callback

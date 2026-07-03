@@ -8,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from .const import (
     DOMAIN,
@@ -49,12 +50,14 @@ class RedbackTechBinarySensorEntity(CoordinatorEntity, BinarySensorEntity):
     def __init__(self, coordinator, device_key, entity_key):
         super().__init__(coordinator)
         self.entity_key = entity_key
+        # Use slugify() to ensure entity_id contains only valid characters
+        # (HA 2027.2.0 will reject entity IDs with hyphens or other invalid chars).
         self.entity_id = (
             "binary_sensor.aemonem"
             + "_"
-            + device_key.lower()
+            + slugify(device_key)
             + "_"
-            + entity_key.lower()
+            + slugify(entity_key)
         )
         self.entity_name = entity_key
         self.device_key=device_key
