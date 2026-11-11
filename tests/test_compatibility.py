@@ -14,6 +14,7 @@ from aiohttp.test_utils import TestServer
 from aemonemdata.exceptions import AuthError, ClientError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from custom_components.aemo_nem import binary_sensor, sensor
@@ -183,31 +184,91 @@ class CompatibilityTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(entity.native_value, 7100)
             self.assertFalse(self.session.closed)
 
+    async def test_client_initialization_errors_are_retryable(self):
+        for exception in (AuthError, ClientError):
+            with self.subTest(exception=exception.__name__):
+                error = exception("dashboard initialization failed")
+                with (
+                    patch(
+                        "custom_components.aemo_nem.coordinator.async_get_clientsession",
+                        return_value=self.session,
+                    ),
+                    patch(
+                        "custom_components.aemo_nem.coordinator.AemoNemData",
+                        side_effect=error,
+                    ),
+                ):
+                    with self.assertRaises(ConfigEntryNotReady) as raised:
+                        AemoNemUpdateCoordinator(self.hass, self.entry)
+                self.assertIs(raised.exception.__cause__, error)
+                self.assertIn("dashboard initialization failed", str(raised.exception))
+                self.assertFalse(self.session.closed)
+
     async def test_errors_remain_unavailable_until_successful_retry(self):
-        self.coordinator.data = {"cached": True}
-        with patch("custom_components.aemo_nem.coordinator.datetime") as clock:
+        entities = (
+            sensor.AemoNemSensorEntity(
+                self.coordinator, "NSW1", "current_5min_period_price", 0.1
+            ),
+            binary_sensor.RedbackTechBinarySensorEntity(
+                self.coordinator, "NSW1", "apc_flag"
+            ),
+        )
+        with (
+            patch("custom_components.aemo_nem.coordinator.datetime") as clock,
+            patch("custom_components.aemo_nem.coordinator.monotonic") as timer,
+        ):
             clock.now.return_value = START + timedelta(minutes=1)
-            for exception in (ClientError, AuthError):
-                with self.subTest(exception=exception.__name__):
+            timer.return_value = 1000
+            for exception, initial_data in (
+                (ClientError, None), (AuthError, {"cached": True})
+            ):
+                with self.subTest(exception=exception.__name__, cached=initial_data):
+                    self.coordinator.data = initial_data
+                    for entity in entities:
+                        self.assertTrue(entity.available, entity.entity_id)
                     error = exception("dashboard unavailable")
                     fetch = AsyncMock(side_effect=error)
+                    failed_at = timer.return_value
+                    cached = self.coordinator.data
                     with patch.object(self.coordinator.client, "get_aemo_data", fetch):
                         with self.assertRaises(UpdateFailed) as raised:
                             await self.coordinator._async_update_data()
                         self.assertIs(raised.exception.__cause__, error)
                         await self.coordinator.async_refresh()
                         self.assertFalse(self.coordinator.last_update_success)
+                        for entity in entities:
+                            self.assertFalse(entity.available, entity.entity_id)
                         clock.now.return_value = START + timedelta(minutes=4)
+                        for elapsed in (*range(15, 300, 15), 299.999):
+                            timer.return_value = failed_at + elapsed
+                            await self.coordinator.async_refresh()
+                            self.assertFalse(self.coordinator.last_update_success)
+                            for entity in entities:
+                                self.assertFalse(entity.available, entity.entity_id)
+                            self.assertIs(self.coordinator.data, cached)
+                        self.assertEqual(fetch.await_count, 1)
+                        timer.return_value = failed_at + 300
                         await self.coordinator.async_refresh()
                         self.assertFalse(self.coordinator.last_update_success)
-                        self.assertEqual(fetch.await_count, 3)
+                        for entity in entities:
+                            self.assertFalse(entity.available, entity.entity_id)
+                        self.assertEqual(fetch.await_count, 2)
                     result = {"recovered": True}
                     with patch.object(
                         self.coordinator.client, "get_aemo_data",
                         AsyncMock(return_value=result),
                     ) as fetch:
+                        timer.return_value = failed_at + 599.999
+                        await self.coordinator.async_refresh()
+                        self.assertFalse(self.coordinator.last_update_success)
+                        for entity in entities:
+                            self.assertFalse(entity.available, entity.entity_id)
+                        fetch.assert_not_awaited()
+                        timer.return_value = failed_at + 600
                         await self.coordinator.async_refresh()
                         self.assertTrue(self.coordinator.last_update_success)
+                        for entity in entities:
+                            self.assertTrue(entity.available, entity.entity_id)
                         self.assertIs(self.coordinator.data, result)
                         await self.coordinator.async_refresh()
                         fetch.assert_awaited_once_with(STATES)

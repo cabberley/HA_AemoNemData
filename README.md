@@ -127,6 +127,10 @@ This release requires Home Assistant 2026.5.0 or newer and pins
 The library discovers and refreshes the public dashboard key automatically;
 no credentials are required. Persistent dashboard authentication, connection,
 or response errors make the entities unavailable until a successful retry.
+Failed dashboard fetches are retried no more than once every five minutes,
+even when the configured polling interval is shorter. Entities stay unavailable
+during this wait; successful updates resume the normal fetch cadence.
+Client initialization errors also trigger Home Assistant's automatic setup retries.
 Timestamps use fixed NEM market time (UTC+10).
 
 Run the offline integration compatibility tests with Home Assistant and the
