@@ -11,7 +11,7 @@ from homeassistant.components.sensor import (
 )
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import MATCH_ALL #, UnitOfEnergy, UnitOfPower
+from homeassistant.const import MATCH_ALL, UnitOfPower
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -275,13 +275,12 @@ class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def native_unit_of_measurement(self):
         """Return native Unit of Measurement for this entity."""
-        return "MW"
-        #UnitOfPower.MEGA_WATT - Doesn't yet have MW as a unit
+        return UnitOfPower.MEGA_WATT
 
     @property
     def device_class(self) -> SensorDeviceClass:
         """Return entity device class."""
-        return None #SensorDeviceClass.POWER - Doesn't yet have MW as a unit
+        return SensorDeviceClass.POWER
 
     @property
     def suggested_display_precision(self) -> int:
@@ -291,7 +290,7 @@ class AemoNemInterconnectorSensorEntity(CoordinatorEntity, SensorEntity):
     @property
     def state_class(self) -> SensorStateClass:
         """Return the type of state class."""
-        return SensorStateClass.TOTAL
+        return SensorStateClass.MEASUREMENT
 
     @property
     def entity_category(self) -> EntityCategory:

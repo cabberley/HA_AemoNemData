@@ -17,6 +17,7 @@ from homeassistant.const import (
     PERCENTAGE,
     CURRENCY_DOLLAR,
     UnitOfEnergy,
+    UnitOfPower,
     
 )
 
@@ -250,10 +251,10 @@ ENTITY_DETAILS = {
     },
     "total_demand": {
         "name": "Generation Total Demand",
-        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "unit": UnitOfPower.MEGA_WATT,
         "icon": None,
-        "device_class": SensorDeviceClass.ENERGY,
-        "state_class": SensorStateClass.TOTAL,
+        "device_class": SensorDeviceClass.POWER,
+        "state_class": SensorStateClass.MEASUREMENT,
         "display_precision": 0,
         "options": None,
         "mode": None,
@@ -264,10 +265,10 @@ ENTITY_DETAILS = {
     },
     "scheduled_generation": {
         "name": "Generation Scheduled",
-        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "unit": UnitOfPower.MEGA_WATT,
         "icon": None,
-        "device_class": SensorDeviceClass.ENERGY,
-        "state_class": SensorStateClass.TOTAL,
+        "device_class": SensorDeviceClass.POWER,
+        "state_class": SensorStateClass.MEASUREMENT,
         "display_precision": 0,
         "options": None,
         "mode": None,
@@ -278,10 +279,10 @@ ENTITY_DETAILS = {
     },
     "semi_scheduled_generation": {
         "name": "Generation Semi Scheduled",
-        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "unit": UnitOfPower.MEGA_WATT,
         "icon": None,
-        "device_class": SensorDeviceClass.ENERGY,
-        "state_class": SensorStateClass.TOTAL,
+        "device_class": SensorDeviceClass.POWER,
+        "state_class": SensorStateClass.MEASUREMENT,
         "display_precision": 0,
         "options": None,
         "mode": None,
@@ -292,10 +293,10 @@ ENTITY_DETAILS = {
     },
     "net_interconnector_flows": {
         "name": "Generation Net Connector Flows",
-        "unit": UnitOfEnergy.MEGA_WATT_HOUR,
+        "unit": UnitOfPower.MEGA_WATT,
         "icon": None,
-        "device_class": SensorDeviceClass.ENERGY,
-        "state_class": SensorStateClass.TOTAL,
+        "device_class": SensorDeviceClass.POWER,
+        "state_class": SensorStateClass.MEASUREMENT,
         "display_precision": 0,
         "options": None,
         "mode": None,
@@ -319,4 +320,3 @@ ENTITY_DETAILS = {
         "data_set": "current_30min_forecast",
     },
 }
-

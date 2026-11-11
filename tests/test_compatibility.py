@@ -12,7 +12,9 @@ from unittest.mock import AsyncMock, Mock, patch
 from aiohttp import ClientSession, web
 from aiohttp.test_utils import TestServer
 from aemonemdata.exceptions import AuthError, ClientError
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import UpdateFailed
@@ -149,10 +151,25 @@ class CompatibilityTests(unittest.IsolatedAsyncioTestCase):
             clock.now.return_value = START + timedelta(minutes=1)
             await self.coordinator.async_refresh()
             sensors, flags = await self.entities()
+            power_values = {
+                "total_demand": 7000,
+                "scheduled_generation": 4000,
+                "semi_scheduled_generation": 3000,
+                "net_interconnector_flows": -100,
+                "V-SA": -100,
+            }
             for entity in sensors:
                 with self.subTest(region=entity.device_key, entity=entity.entity_name):
+                    if entity.entity_name in power_values:
+                        self.assertEqual(entity.native_value, power_values[entity.entity_name])
+                        self.assertEqual(entity.native_unit_of_measurement, UnitOfPower.MEGA_WATT)
+                        self.assertEqual(entity.device_class, SensorDeviceClass.POWER)
+                        self.assertEqual(entity.state_class, SensorStateClass.MEASUREMENT)
                     if entity.entity_name == "period_1":
                         self.assertEqual(entity.native_value, 0.1)
+                        self.assertEqual(entity.native_unit_of_measurement, "$/kWh")
+                    elif entity.entity_name == "market_price_cap":
+                        self.assertEqual(entity.native_unit_of_measurement, "$/MWh")
                     elif entity.entity_name == "period_2":
                         self.assertEqual(entity.native_value, -0.05)
                     elif entity.entity_name.startswith("period_"):
