@@ -35,7 +35,6 @@ class AemoNemConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """AemoNem config flow."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
 
     entry: config_entries.ConfigEntry | None
 
