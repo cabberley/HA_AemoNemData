@@ -12,3 +12,22 @@ jobs:
     steps:
         - uses: "actions/checkout@v4"
         - uses: "home-assistant/actions/hassfest@master"
+
+  compatibility:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        homeassistant: ["homeassistant==2026.5.0", "homeassistant"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install Home Assistant and the pinned integration dependency
+        env:
+          HA_REQUIREMENT: ${{ matrix.homeassistant }}
+        run: |
+          python -m pip install "$HA_REQUIREMENT"
+          python -c "import json, pathlib, subprocess, sys; manifest = json.loads(pathlib.Path('custom_components', 'aemo_nem', 'manifest.json').read_text()); subprocess.check_call([sys.executable, '-m', 'pip', 'install', *manifest['requirements']])"
+      - name: Test library and entity compatibility offline
+        run: python -W error::ResourceWarning -m unittest discover -s tests -v

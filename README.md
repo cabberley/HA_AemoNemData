@@ -84,7 +84,7 @@ This combines the actual prices for the current 30 minute period with the curren
 
 ### Period 1 - 6
 
-For the 5 minute periods which have had their price set this is the value for each 5 minute period of the 30 minutes. For periods which have not yet had their price set the value will be 0
+For the 5 minute periods which have had their price set this is the value for each 5 minute period of the 30 minutes. Periods which have not yet had their price set are unknown, not zero.
 
 ### Current Cumulative Price
 
@@ -119,3 +119,31 @@ This is the current percentage of the rolling cumulative price with the Cumulati
 ### Market Price Cap
 
 The Regions current maximum price per MW that the 5 minute pricing can reach. Increases normally each year on the 1st of July.
+
+## Library compatibility
+
+This release requires Home Assistant 2026.5.0 or newer and pins
+`aemonemdata==2026.11.0`, which uses the new AEMO public dashboard endpoints.
+The library discovers and refreshes the public dashboard key automatically;
+no credentials are required. Persistent dashboard authentication, connection,
+or response errors make the entities unavailable until a successful retry.
+Failed dashboard fetches are retried no more than once every five minutes,
+even when the configured polling interval is shorter. Entities stay unavailable
+during this wait; successful updates resume the normal fetch cadence.
+Client initialization errors also trigger Home Assistant's automatic setup retries.
+Timestamps use fixed NEM market time (UTC+10).
+
+Run the offline integration compatibility tests with Home Assistant and the
+pinned library installed:
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+To also check current AEMO data for all five regions:
+
+```powershell
+$env:AEMONEM_LIVE_TESTS = "1"
+python -m unittest discover -s tests -v
+Remove-Item Env:AEMONEM_LIVE_TESTS
+```
